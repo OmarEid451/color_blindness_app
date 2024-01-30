@@ -20,6 +20,7 @@ hex_doc.close()
 for tag in color_names:
     color = str(tag.contents[0].string)
     color = color.strip()
+    color = color.replace('\n', '')
     color_name_doc.write(color)
     color_name_doc.write('\n')
 color_name_doc.close()
