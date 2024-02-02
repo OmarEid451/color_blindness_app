@@ -9,6 +9,6 @@ for tag in colors:
     hex_num = tag['style'].split(':')[1][1:-1]
     color_dict[hex_num] = tag.text
 
-json.dump(color_dict, json_handle)
+json.dump(color_dict, json_handle, indent=4)
 webpage.close()
 json_handle.close()
