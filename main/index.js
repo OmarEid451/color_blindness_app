@@ -1,29 +1,32 @@
-//test to see if I can auto render an image from a browser function
+// function to load user supplied image to the browser
 function loadImage(event) {
-    
-    // TODO fix rendering problem in code
-     /* look at this link for reference https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications */
-    // now we need to create a canvas using the loaded image: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images
-    image_element = document.createElement("img");
-    image_element.src = URL.createObjectURL(event.target.files[0]);
+    const file = event.target.files[0];
 
-    var canvas_wdith = image_element.width;
-    var canvas_height = image_element.height;
+    const image_element = new Image();
 
-    canvas_element.width = canvas_wdith;
-    canvas_element.height = canvas_height;
-    context = canvas_element.getContext("2d");
+    image_element.onload = function () {
+        // get canvas element 
+        const canvas_element = document.getElementById("current_image");
+        const context = canvas_element.getContext("2d");
+       
+        // Set canvas dimensions to match image
+        canvas_element.width = this.width;
+        canvas_element.height = this.height;
 
+        // draw image_onto canvas
+        context.drawImage(this, 0, 0);
+    };
+    image_element.src = URL.createObjectURL(file);
 
-    context.drawImage(image_element, 0, 0);
-    URL.revokeObjectURL(image_element.src);
 }
 
-// get both the input and div tags from the page.
-file = document.getElementById("picture");
-canvas_element = document.getElementById("current_image");
+// get  the input tag and add listener
+inputFile = document.getElementById("picture");
+inputFile.addEventListener("change", loadImage);
 
-file.addEventListener("change", loadImage);
+
+// TODO make logic for getting the pixel on hover
+// open JSON and parse it.
 
 
     
