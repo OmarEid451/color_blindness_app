@@ -20,13 +20,20 @@ function loadImage(event) {
 
 }
 
+
+// TODO make logic for getting the pixel on hover
+// https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas#a_color_picker
+
+// TODO make function to compare pixel hex value to the one in the database
+// ensure that there is some kind of fall through if the color is not in the database.
+
+// get local json file and store it in an object
+// json file is script that has a hard coded js Object loaded into memory 
+
+const color_data = document.getElementById("colors");
+
 // get  the input tag and add listener
 inputFile = document.getElementById("picture");
 inputFile.addEventListener("change", loadImage);
 
 
-// TODO make logic for getting the pixel on hover
-// open JSON and parse it.
-
-
-    
