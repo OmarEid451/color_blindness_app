@@ -24,6 +24,25 @@ function loadImage(event) {
 // TODO make logic for getting the pixel on hover
 // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas#a_color_picker
 
+
+function displayColor(event) {
+    var current_color = document.getElementById("descriptor");
+    var context = event.target.getContext("2d");
+
+    //setting up boundary for reading pixel data
+    const bounding = event.target.getBoundingClientRect();
+    const x = event.clientX - bounding.left;
+    const y = event.clientY - bounding.top;
+    const pixel = context.getImageData(x, y, 1, 1);
+    const pixel_data = pixel.data;
+    current_color.textContent = `${pixel_data[0]}`;
+}
+
+
+    
+
+
+
 // TODO make function to compare pixel hex value to the one in the database
 // ensure that there is some kind of fall through if the color is not in the database.
 
@@ -36,4 +55,6 @@ const color_data = document.getElementById("colors");
 inputFile = document.getElementById("picture");
 inputFile.addEventListener("change", loadImage);
 
+canvas = document.getElementById("current_image");
+canvas.addEventListener("mouseover", displayColor);
 
