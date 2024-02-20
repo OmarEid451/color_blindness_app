@@ -23,16 +23,15 @@ function loadImage(event) {
 
 // TODO make logic for getting the pixel on hover
 // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas#a_color_picker
-
+// check this page to see how to implement rolling scroll: https://developer.mozilla.org/en-US/docs/Web/API/Element/mousemove_event#examples
 
 function displayColor(event) {
     var current_color = document.getElementById("descriptor");
     var context = event.target.getContext("2d");
 
     //setting up boundary for reading pixel data
-    const bounding = event.target.getBoundingClientRect();
-    const x = event.clientX - bounding.left;
-    const y = event.clientY - bounding.top;
+    const x = event.offsetX;
+    const y = event.offsetY;
     const pixel = context.getImageData(x, y, 1, 1);
     const pixel_data = pixel.data;
     current_color.textContent = `${pixel_data[0]}`;
@@ -56,5 +55,5 @@ inputFile = document.getElementById("picture");
 inputFile.addEventListener("change", loadImage);
 
 canvas = document.getElementById("current_image");
-canvas.addEventListener("mouseover", displayColor);
+canvas.addEventListener("mousemove", displayColor);
 
