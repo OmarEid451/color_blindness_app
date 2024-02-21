@@ -21,7 +21,7 @@ function loadImage(event) {
 }
 
 
-// TODO make logic for getting the pixel on hover
+//  logic for getting the pixel on hover
 // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas#a_color_picker
 // check this page to see how to implement rolling scroll: https://developer.mozilla.org/en-US/docs/Web/API/Element/mousemove_event#examples
 
@@ -34,16 +34,29 @@ function displayColor(event) {
     const y = event.offsetY;
     const pixel = context.getImageData(x, y, 1, 1);
     const pixel_data = pixel.data;
-    current_color.textContent = `${pixel_data[0]}`;
+    const red_value = pixel_data[0];
+    const green_value = pixel_data[1];
+    const blue_value = pixel_data[2];
+    
+    current_color.textContent = findPixelColor(red_value, green_value, blue_value);
 }
 
 
-    
+/* compares rgb values to values in the json data.
+ * if we find an exact match we return the string key
+ * otherwise we find the closest color
+ * https://nesin.io/blog/find-closest-color-javascript
+ */
+function findPixelColor(red, green, blue) {
+    for (const color_name in color_db) {
+	var rgb = color_db[color_name];
+	if (red == rgb[0] && green == rgb[1] && blue == rgb[2]) {
+	    return color_name;
+	}
+    }
+    // TODO implement fallthrough to find closest color
+}
 
-
-
-// TODO make function to compare pixel hex value to the one in the database
-// ensure that there is some kind of fall through if the color is not in the database.
 
 // get local json file and store it in an object
 // json file is script that has a hard coded js Object loaded into memory 
