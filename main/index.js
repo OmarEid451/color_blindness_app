@@ -38,9 +38,37 @@ function displayColor(event) {
     const green_value = pixel_data[1];
     const blue_value = pixel_data[2];
     
+    // set pre tag to contain the color name 
     current_color.textContent = findPixelColor(red_value, green_value, blue_value);
 }
 
+
+function findClosestColor(r1, g1, b1) {
+    var closestColor = null;
+    var closestDistance = Infinity;
+    
+    // loop and use Euclidian distance  to find the closest color in the database
+    for (const color_name in color_db) {
+        var rgb = color_db[color_name];
+        const r2 = rgb[0];
+        const g2 = rgb[1];
+        const b2 = rgb[2];
+
+        const distance = Math.sqrt(
+            (r1 - r2) ** 2 +
+            (g1 - g2) ** 2 +
+            (b1 - b2) ** 2 
+        );
+
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestColor = color_name;
+        }
+
+    }
+    return closestColor;
+
+}
 
 /* compares rgb values to values in the json data.
  * if we find an exact match we return the string key
@@ -54,12 +82,14 @@ function findPixelColor(red, green, blue) {
 	    return color_name;
 	}
     }
-    // TODO implement fallthrough to find closest color
+    // fallthrough to find closest color
+    var closestColor = findClosestColor(red, green, blue);
+    return closestColor;
 }
 
 
 // get local json file and store it in an object
-// json file is script that has a hard coded js Object loaded into memory 
+// json file is script that has a hard coded js Object loaded into memory color_db is the name of the js object.
 
 const color_data = document.getElementById("colors");
 
