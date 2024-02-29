@@ -1,3 +1,24 @@
+/* created by Omar Eid
+ * 2024-01-27
+ * Main functionality for application
+ */
+/*
+Copyright (C) 2024  Omar Eid
+
+This file is part of Color Descriptor Application.
+Color Descriptor Application is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 // function to load user supplied image to the browser
 function loadImage(event) {
     const file = event.target.files[0];
@@ -30,8 +51,8 @@ function displayColor(event) {
     var context = event.target.getContext("2d");
 
     //setting up boundary for reading pixel data
-    const x = event.offsetX;
-    const y = event.offsetY;
+    const x = event.clientX;
+    const y = event.clientY;
     const pixel = context.getImageData(x, y, 1, 1);
     const pixel_data = pixel.data;
     const red_value = pixel_data[0];
@@ -46,9 +67,12 @@ function displayColor(event) {
 function findClosestColor(r1, g1, b1) {
     var closestColor = null;
     var closestDistance = Infinity;
-    
+    // color data holds object of basic color names named safe_color_db
+
+    var safe_color_data = document.getElementById("safe_colors.js");
     // loop and use Euclidian distance  to find the closest color in the database
-    for (const color_name in color_db) {
+
+    for (const color_name in safe_color_db) {
         var rgb = color_db[color_name];
         const r2 = rgb[0];
         const g2 = rgb[1];
@@ -98,5 +122,5 @@ inputFile = document.getElementById("picture");
 inputFile.addEventListener("change", loadImage);
 
 canvas = document.getElementById("current_image");
-canvas.addEventListener("mousemove", displayColor);
+canvas.addEventListener("click", displayColor);
 
