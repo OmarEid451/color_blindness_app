@@ -63,6 +63,10 @@ function displayColor(event) {
     current_color.textContent = findPixelColor(red_value, green_value, blue_value);
 }
 
+// TODO use https://www.easyrgb.com/en/math.php to create a set of functions to provide more accurate color distances
+//  convert Standard-RGB → XYZ 
+//  convert XYZ → CIE-L*ab
+// use  Delta E* CIE for finding the smallest distance between colors 
 
 function findClosestColor(r1, g1, b1) {
     var closestColor = null;
