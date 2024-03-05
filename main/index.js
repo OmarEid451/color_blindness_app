@@ -2,6 +2,7 @@
  * 2024-01-27
  * Main functionality for application
  */
+
 /*
 Copyright (C) 2024  Omar Eid
 
@@ -20,6 +21,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 // function to load user supplied image to the browser
+
 function loadImage(event) {
     const file = event.target.files[0];
 
@@ -67,6 +69,48 @@ function displayColor(event) {
 //  convert Standard-RGB → XYZ 
 //  convert XYZ → CIE-L*ab
 // use  Delta E* CIE for finding the smallest distance between colors 
+
+
+
+function RGB_to_XYZ(red, green, blue) {
+    var newRed = red / 255;
+    var newGreen = green / 255;
+    var newBlue = blue / 255;
+
+    if (newRed > 0.04045) {
+        newRed = ((newRed + 0.055) /1.055) ** 2.4;
+    }
+    else {
+        newRed = newRed / 12.92;
+    }
+
+
+    if (newGreen > 0.04045) {
+        newGreen = ((newGreen + 0.055) /1.055) ** 2.4;
+    }
+    else {
+        newGreen = newGreen / 12.92;
+    }
+
+
+    if (newBlue > 0.04045) {
+        newBlue = ((newBlue + 0.055) /1.055) ** 2.4;
+    }
+    else {
+        newBlue = newBlue / 12.92;
+    }
+
+    newRed = newRed * 100;
+    newBlue = newBlue * 100;
+    newGreen = newGreen * 100;
+
+    var X = (newRed * 0.4124) + (newGreen * 0.3576) + (newBlue * 0.1805);
+    var Y = (newRed * 0.2126) + (newGreen * 0.7152) + (newBlue * 0.0722);
+    var Z = (newRed * 0.0193) + (newGreen * 0.1192) + (newBlue * 0.9505);
+
+    var XYZ_values = {"X": X, "Y": Y, "Z": Z};
+    return XYZ_values;
+}
 
 function findClosestColor(r1, g1, b1) {
     var closestColor = null;
@@ -127,4 +171,3 @@ inputFile.addEventListener("change", loadImage);
 
 canvas = document.getElementById("current_image");
 canvas.addEventListener("click", displayColor);
-
