@@ -20,6 +20,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 // function to load user supplied image to the browser
 
 function loadImage(event) {
@@ -69,10 +70,10 @@ function displayColor(event) {
 //  convert Standard-RGB → XYZ 
 //  convert XYZ → CIE-L*ab
 // use  Delta E* CIE for finding the smallest distance between colors 
+// https://sensing.konicaminolta.us/us/blog/understanding-standard-observers-in-color-measurement/
 
 
-
-function RGB_to_XYZ(red, green, blue) {
+function RGBtoXYZ(red, green, blue) {
     var newRed = red / 255;
     var newGreen = green / 255;
     var newBlue = blue / 255;
@@ -108,9 +109,52 @@ function RGB_to_XYZ(red, green, blue) {
     var Y = (newRed * 0.2126) + (newGreen * 0.7152) + (newBlue * 0.0722);
     var Z = (newRed * 0.0193) + (newGreen * 0.1192) + (newBlue * 0.9505);
 
-    var XYZ_values = {"X": X, "Y": Y, "Z": Z};
+    const XYZ_values = {"X": X, "Y": Y, "Z": Z};
+    console.log(XYZ_values);
     return XYZ_values;
 }
+
+
+
+// convert XYZ to CIELab using a D65/2° illuminaugt observer
+function XYZtoCIELAB(X, Y, Z) {
+    var newX = X / 95.047;
+    var newY = Y / 100.000;
+    var newZ = Z / 108.883;
+
+    if (newX > 0.008856) {
+        newX = newX ** (1/3);
+    }
+    else {
+        newX = (7.787 * newX) + (16 / 116);
+    }
+
+
+    if (newY > 0.008856) {
+        newY = newY ** (1/3);
+    }
+    else {
+        newY = (7.787 * newY) + (16 / 116);
+    }
+
+    if (newZ > 0.008856) {
+        newZ = newZ ** (1/3);
+    }
+    else {
+        newZ = (7.787 * newZ) + (16 / 116);
+    }
+
+
+    var CIE_L = (116 * newY) - 16;
+    var CIE_a = 500 * (newX - newY);
+    var CIE_b = 200 * (newY - newZ);
+
+    const CIE_values = {"L": CIE_L, "a": CIE_a, "b": CIE_b};
+    console.log(CIE_values);
+    return CIE_values;
+}
+
+
 
 function findClosestColor(r1, g1, b1) {
     var closestColor = null;
@@ -171,3 +215,7 @@ inputFile.addEventListener("change", loadImage);
 
 canvas = document.getElementById("current_image");
 canvas.addEventListener("click", displayColor);
+
+//santity checking functions
+const xyz = RGBtoXYZ(50, 60, 70);
+const cielab = XYZtoCIELAB(xyz["X"], xyz["Y"], xyz["Z"]);
