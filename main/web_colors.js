@@ -1,4 +1,4 @@
-const color_db = {
+const color_database = {
     "MediumVioletRed": [
         "199",
         "21",

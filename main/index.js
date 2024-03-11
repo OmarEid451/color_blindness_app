@@ -54,8 +54,9 @@ function displayColor(event) {
     var context = event.target.getContext("2d");
 
     //setting up boundary for reading pixel data
-    const x = event.clientX;
-    const y = event.clientY;
+    const bounding = event.target.getBoundingClientRect();
+    const x = event.clientX - bounding.left;
+    const y = event.clientY - bounding.top;
     const pixel = context.getImageData(x, y, 1, 1);
     const pixel_data = pixel.data;
     const red_value = pixel_data[0];
@@ -74,40 +75,40 @@ function displayColor(event) {
 
 
 function RGBtoXYZ(red, green, blue) {
-    var newRed = red / 255;
-    var newGreen = green / 255;
-    var newBlue = blue / 255;
+    var new_red = red / 255;
+    var new_green = green / 255;
+    var new_blue = blue / 255;
 
-    if (newRed > 0.04045) {
-        newRed = ((newRed + 0.055) /1.055) ** 2.4;
+    if (new_red > 0.04045) {
+        new_red = ((new_red + 0.055) /1.055) ** 2.4;
     }
     else {
-        newRed = newRed / 12.92;
+        new_red = new_red / 12.92;
     }
 
 
-    if (newGreen > 0.04045) {
-        newGreen = ((newGreen + 0.055) /1.055) ** 2.4;
-    }
-    else {
-        newGreen = newGreen / 12.92;
-    }
-
-
-    if (newBlue > 0.04045) {
-        newBlue = ((newBlue + 0.055) /1.055) ** 2.4;
+    if (new_green > 0.04045) {
+        new_green = ((new_green + 0.055) /1.055) ** 2.4;
     }
     else {
-        newBlue = newBlue / 12.92;
+        new_green = new_green / 12.92;
     }
 
-    newRed = newRed * 100;
-    newBlue = newBlue * 100;
-    newGreen = newGreen * 100;
 
-    var X = (newRed * 0.4124) + (newGreen * 0.3576) + (newBlue * 0.1805);
-    var Y = (newRed * 0.2126) + (newGreen * 0.7152) + (newBlue * 0.0722);
-    var Z = (newRed * 0.0193) + (newGreen * 0.1192) + (newBlue * 0.9505);
+    if (new_blue > 0.04045) {
+        new_blue = ((new_blue + 0.055) /1.055) ** 2.4;
+    }
+    else {
+        new_blue = new_blue / 12.92;
+    }
+
+    new_red = new_red * 100;
+    new_blue = new_blue * 100;
+    new_green = new_green * 100;
+
+    var X = (new_red * 0.4124) + (new_green * 0.3576) + (new_blue * 0.1805);
+    var Y = (new_red * 0.2126) + (new_green * 0.7152) + (new_blue * 0.0722);
+    var Z = (new_red * 0.0193) + (new_green * 0.1192) + (new_blue * 0.9505);
 
     const XYZ_values = {"X": X, "Y": Y, "Z": Z};
     console.log(XYZ_values);
@@ -117,37 +118,37 @@ function RGBtoXYZ(red, green, blue) {
 
 
 // convert XYZ to CIELab using a D65/2° illuminaugt observer
-function XYZtoCIELAB(X, Y, Z) {
-    var newX = X / 95.047;
-    var newY = Y / 100.000;
-    var newZ = Z / 108.883;
+function XYZtoCIELAB(imageValues) {
+    var new_x = imageValues["X"] / 95.047;
+    var new_y = imageValues["Y"] / 100.000;
+    var new_z = imageValues["Z"] / 108.883;
 
-    if (newX > 0.008856) {
-        newX = newX ** (1/3);
+    if (new_x > 0.008856) {
+        new_x = new_x ** (1/3);
     }
     else {
-        newX = (7.787 * newX) + (16 / 116);
+        new_x = (7.787 * new_x) + (16 / 116);
     }
 
 
-    if (newY > 0.008856) {
-        newY = newY ** (1/3);
-    }
-    else {
-        newY = (7.787 * newY) + (16 / 116);
-    }
-
-    if (newZ > 0.008856) {
-        newZ = newZ ** (1/3);
+    if (new_y > 0.008856) {
+        new_y = new_y ** (1/3);
     }
     else {
-        newZ = (7.787 * newZ) + (16 / 116);
+        new_y = (7.787 * new_y) + (16 / 116);
+    }
+
+    if (new_z > 0.008856) {
+        new_z = new_z ** (1/3);
+    }
+    else {
+        new_z = (7.787 * new_z) + (16 / 116);
     }
 
 
-    var CIE_L = (116 * newY) - 16;
-    var CIE_a = 500 * (newX - newY);
-    var CIE_b = 200 * (newY - newZ);
+    var CIE_L = (116 * new_y) - 16;
+    var CIE_a = 500 * (new_x - new_y);
+    var CIE_b = 200 * (new_y - new_z);
 
     const CIE_values = {"L": CIE_L, "a": CIE_a, "b": CIE_b};
     console.log(CIE_values);
@@ -155,34 +156,54 @@ function XYZtoCIELAB(X, Y, Z) {
 }
 
 
+function deltaE_CIE(color_one_values, color_two_values) {
+
+    const L1 = color_one_values["L"];
+    const a1 = color_one_values["a"];
+    const b1 = color_one_values["b"];
+
+    const L2 = color_two_values["L"];
+    const a2 = color_two_values["a"];
+    const b2 = color_two_values["b"];
+
+    const delta_e = Math.sqrt(
+        ((L1 - L2) ** 2) + ((a1 - a2) ** 2) + ((b1 - b2) ** 2)
+    );
+
+    return delta_e;
+}
+
+    
 
 function findClosestColor(r1, g1, b1) {
-    var closestColor = null;
-    var closestDistance = Infinity;
-    // color data holds object of basic color names named safe_color_db
+    var closest_color = null;
+    var closest_distance = Infinity;
+    // color data holds object of basic color names named safe_color_database
 
-    var safe_color_data = document.getElementById("safe_colors.js");
-    // loop and use Euclidian distance  to find the closest color in the database
+    var safe_color_data = document.getElementById("safe_colors");
+    // convert both RGB to CIELAB values and then compares their Delta to find the distance
 
-    for (const color_name in safe_color_db) {
-        var rgb = color_db[color_name];
+    for (const color_name in safe_color_database) {
+        var rgb = color_database[color_name];
         const r2 = rgb[0];
         const g2 = rgb[1];
         const b2 = rgb[2];
 
-        const distance = Math.sqrt(
-            (r1 - r2) ** 2 +
-            (g1 - g2) ** 2 +
-            (b1 - b2) ** 2 
-        );
+        const image_XYZ_values = RGBtoXYZ(r1, g1, b1);
+        const image_CIE_values = XYZtoCIELAB(image_XYZ_values);
 
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closestColor = color_name;
+        const database_XYZ_values = RGBtoXYZ(r2, g2, b2);
+        const database_CIE_values = XYZtoCIELAB(database_XYZ_values);
+        const distance = deltaE_CIE(database_CIE_values, image_CIE_values);
+        
+        
+        if (distance < closest_distance) {
+            closest_distance = distance;
+            closest_color = color_name;
         }
 
     }
-    return closestColor;
+    return closest_color;
 
 }
 
@@ -192,20 +213,20 @@ function findClosestColor(r1, g1, b1) {
  * https://nesin.io/blog/find-closest-color-javascript
  */
 function findPixelColor(red, green, blue) {
-    for (const color_name in color_db) {
-	var rgb = color_db[color_name];
+    for (const color_name in color_database) {
+	var rgb = color_database[color_name];
 	if (red == rgb[0] && green == rgb[1] && blue == rgb[2]) {
 	    return color_name;
 	}
     }
     // fallthrough to find closest color
-    var closestColor = findClosestColor(red, green, blue);
-    return closestColor;
+    var closest_color = findClosestColor(red, green, blue);
+    return closest_color;
 }
 
 
 // get local json file and store it in an object
-// json file is script that has a hard coded js Object loaded into memory color_db is the name of the js object.
+// json file is script that has a hard coded js Object loaded into memory color_database is the name of the js object.
 
 const color_data = document.getElementById("colors");
 
@@ -218,4 +239,4 @@ canvas.addEventListener("click", displayColor);
 
 //santity checking functions
 const xyz = RGBtoXYZ(50, 60, 70);
-const cielab = XYZtoCIELAB(xyz["X"], xyz["Y"], xyz["Z"]);
+const cielab = XYZtoCIELAB(xyz);

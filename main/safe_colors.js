@@ -1,4 +1,4 @@
- const safe_color_db = {
+ const safe_color_database = {
 
     "Black": [
         "0",
