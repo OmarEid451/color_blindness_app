@@ -156,19 +156,59 @@ function XYZtoCIELAB(imageValues) {
 }
 
 
-function deltaE_CIE(color_one_values, color_two_values) {
+// http://www.brucelindbloom.com/index.html?ColorDifferenceCalc.html
 
-    const L1 = color_one_values["L"];
-    const a1 = color_one_values["a"];
-    const b1 = color_one_values["b"];
+function calculateHPrime(a, b) {
 
-    const L2 = color_two_values["L"];
-    const a2 = color_two_values["a"];
-    const b2 = color_two_values["b"];
+    // we use arctan2 to avoid having to code extra conditions where a or b is 0
+    // all angles are in dagrees so we have to convert from radians
+    const factor = (Math.atan2(b / a)) * (180 * Math.PI);
+    var prime = null;
+    if (factor >= 0) {
+        prime = factor;
+    }
+    else {
+        prime = factor + 360;
+    }
+    return prime;
+}
 
-    const delta_e = Math.sqrt(
-        ((L1 - L2) ** 2) + ((a1 - a2) ** 2) + ((b1 - b2) ** 2)
-    );
+
+function deltaE_2000(sample_color, reference_color) {
+
+    const L1 = sample_color["L"];
+    const a1 = sample_color["a"];
+    const b1 = sample_color["b"];
+
+    const L2 = reference_color["L"];
+    const a2 = reference_color["a"];
+    const b2 = reference_color["b"];
+
+    // setting up variables for solving deltaE
+    const L_prime = (L1 + L2) / 2;
+    const C1 = Math.sqrt(((a1 ** 2) + (b1 ** 2)));
+    const C2 = Math.sqrt(((a2 ** 2) + (b2 ** 2)));
+    //viniculum means this in math notation Ã 
+    const C_viniculum = (C1 + C2) / 2;
+    const G = 0.5 * (1 - Math.sqrt(
+        (C_viniculum ** 7) / ((C_viniculum ** 7) + (25 ** 7))));
+    const a1_prime = a1 * (1 + G);
+    const a2_prime = a2 * (1 + G);
+
+    const C1_prime = Math.sqrt(((a1_prime ** 2) + (b2 ** 2)));
+    const C2_prime = Math.sqrt(((a2_prime ** 2) + (b2 ** 2)));
+
+    const C_viniculum_prime = (C1_prime + C2_prime) / 2;
+    const h1_prime = calculateHPrime(a1_prime, b1);
+    const h2_prime = calculateHPrime(a2_prime, b2);
+    //TODO implement step 14 of bloom's formula
+    
+
+    
+
+
+    
+    
 
     return delta_e;
 }
