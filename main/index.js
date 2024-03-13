@@ -243,16 +243,30 @@ function deltaE_2000(sample_color, reference_color) {
     // same as before we use a sin function so we need to convert delta_h_prime to degrees
     const delta_H_prime = 2 * Math.sqrt(C1_prime * C2_prime) * Math.sin((Math.PI / 180) * (delta_h_prime / 2));
 
-  // TODO step 20 of impementation 
+    const S_subL = 1 + (
+        (0.015 * ((L_prime - 50) ** 2)) / (Math.sqrt(20 + ((L_prime - 50) ** 2)))
+    );
+    const S_subC = 1 + (0.045 * C_viniculum_prime);
+    const S_subH = 1 + (0.015 * (C_viniculum_prime * T));
+    const delta_theta = 30 * Math.exp(
+        -1 * (((h_viniculum_prime - 275) / 25) ** 2)
+    );
+    const R_subC = 2 * (Math.sqrt(
+        (C_viniculum_prime ** 7) /((C_viniculum_prime ** 7) + (25 ** 7)))
+    );
+    const R_subT = -1 * (Math.sin((Math.PI / 180) * (2 * delta_theta)) * R_subC);
+
+    // simplify the terms of the delta e equation 
+
+    const term_1 = (delta_l_prime / S_subL) ** 2;
+    const term_2 = (delta_c_prime / S_subC) ** 2;
+    const term_3 = (delta_H_prime / S_subH) ** 2;
+    const term_4 = R_subT + ( (delta_c_prime / S_subC) * (delta_H_prime / S_subH) );
 
 
+    // now we finally solve delta e
 
-
-    
-
-
-    
-    
+    const delta_e = Math.sqrt(term_1 + term_2 + term_3 + term_4);
 
     return delta_e;
 }
