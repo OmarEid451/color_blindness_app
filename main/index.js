@@ -162,7 +162,7 @@ function calculateHPrime(a, b) {
 
     // we use arctan2 to avoid having to code extra conditions where a or b is 0
     // all angles are in dagrees so we have to convert from radians
-    const factor = (Math.atan2(b / a)) * (180 * Math.PI);
+    const factor = (Math.atan2(b / a)) * (180 / Math.PI);
     var prime = null;
     if (factor >= 0) {
         prime = factor;
@@ -171,6 +171,23 @@ function calculateHPrime(a, b) {
         prime = factor + 360;
     }
     return prime;
+}
+
+function calculateDeltaHPrime(h1, h2) {
+    var delta_prime = null;
+    const h_prime_distance = Math.abs(h2 - h1);
+
+    if (h_prime_distance <= 180) {
+        delta_prime = h2 - h1;
+    }
+    else if (h_prime_distance > 180 && h2 <= h1) {
+        delta_prime = h2 - h1 + 360;
+    }
+    else {
+        delta_prime = h2 - h1 - 360;
+    }
+
+    return delta_prime;
 }
 
 
@@ -201,8 +218,35 @@ function deltaE_2000(sample_color, reference_color) {
     const C_viniculum_prime = (C1_prime + C2_prime) / 2;
     const h1_prime = calculateHPrime(a1_prime, b1);
     const h2_prime = calculateHPrime(a2_prime, b2);
-    //TODO implement step 14 of bloom's formula
     
+    var h_viniculum_prime = null;
+
+    if (Math.abs(h1_prime - h2_prime) > 180) {
+        h_viniculum_prime = (h1_prime + h2_prime + 360) / 2;
+    }
+    else {
+        h_viniculum_prime = (h1_prime + h2_prime) / 2;
+    }
+
+    // To calculate T we use cosine functions which take radians as an argument we need to convert all terms which are in degrees to radians
+
+    const cosine_term_one = Math.cos((Math.PI / 180) * (h_viniculum_prime - 30));
+    const cosine_term_two = Math.cos((Math.PI / 180) * (2 * h_viniculum_prime));
+    const cosine_term_three = Math.cos((Math.PI / 180) * ((3 * h_viniculum_prime) + 6));
+    const cosine_term_four = Math.cos((Math.PI / 180) * ((4 * h_viniculum_prime) - 63));
+
+    T = 1 - (0.17 * cosine_term_one) + (0.24 * cosine_term_two) + (0.32 * cosine_term_three) - (0.20 * cosine_term_four);
+
+    const delta_h_prime = calculateDeltaHPrime(h1_prime, h2_prime);
+    const delta_l_prime = L2 - L1;
+    const delta_c_prime = C2_prime - C1_prime;
+    // same as before we use a sin function so we need to convert delta_h_prime to degrees
+    const delta_H_prime = 2 * Math.sqrt(C1_prime * C2_prime) * Math.sin((Math.PI / 180) * (delta_h_prime / 2));
+
+  // TODO step 20 of impementation 
+
+
+
 
     
 
