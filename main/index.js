@@ -67,10 +67,10 @@ function displayColor(event) {
     current_color.textContent = findPixelColor(red_value, green_value, blue_value);
 }
 
-// TODO use https://www.easyrgb.com/en/math.php to create a set of functions to provide more accurate color distances
+//  use https://www.easyrgb.com/en/math.php to create a set of functions to provide more accurate color distances
 //  convert Standard-RGB → XYZ 
 //  convert XYZ → CIE-L*ab
-// use  Delta E* CIE for finding the smallest distance between colors 
+// use  Delta E* 2000 for finding the smallest distance between colors 
 // https://sensing.konicaminolta.us/us/blog/understanding-standard-observers-in-color-measurement/
 
 
@@ -159,18 +159,33 @@ function XYZtoCIELAB(imageValues) {
 // http://www.brucelindbloom.com/index.html?ColorDifferenceCalc.html
 
 function calculateHPrime(a, b) {
+    var bias = 0;
 
-    // we use arctan2 to avoid having to code extra conditions where a or b is 0
-    // all angles are in dagrees so we have to convert from radians
-    const factor = (Math.atan2(b / a)) * (180 / Math.PI);
-    var prime = null;
-    if (factor >= 0) {
-        prime = factor;
+    if (a >= 0 && b == 0) {
+        return 0;
     }
-    else {
-        prime = factor + 360;
+    if (a < 0 && b == 0) {
+        return 180;
     }
-    return prime;
+    if (a == 0 && b > 0) {
+        return 90;
+    }
+    if (a == 0 && b < 0) {
+        return 270;
+    }
+    if (a > 0 && b > 0) {
+        bias = 0;
+    }
+    if (a < 0 ) {
+        bias = 180;
+    }
+    if (a > 0 && b < 0 ) {
+        bias = 360;
+    }
+
+    var arc_tan = Math.atan(b / a);
+    const result = (arc_tan + bias) * (Math.PI / 180);
+    return result;
 }
 
 function calculateDeltaHPrime(h1, h2) {
@@ -187,19 +202,23 @@ function calculateDeltaHPrime(h1, h2) {
         delta_prime = h2 - h1 - 360;
     }
 
+    if (isNaN(delta_prime)) {
+        alert("NaN is in delta_prime");
+    }
+
     return delta_prime;
 }
 
 
-function deltaE_2000(sample_color, reference_color) {
+function deltaE_2000(reference_color, sample_color) {
 
-    const L1 = sample_color["L"];
-    const a1 = sample_color["a"];
-    const b1 = sample_color["b"];
+    const L1 = reference_color["L"];
+    const a1 = reference_color["a"];
+    const b1 = reference_color["b"];
 
-    const L2 = reference_color["L"];
-    const a2 = reference_color["a"];
-    const b2 = reference_color["b"];
+    const L2 = sample_color["L"];
+    const a2 = sample_color["a"];
+    const b2 = sample_color["b"];
 
     // setting up variables for solving deltaE
     const L_prime = (L1 + L2) / 2;
@@ -268,6 +287,10 @@ function deltaE_2000(sample_color, reference_color) {
 
     const delta_e = Math.sqrt(term_1 + term_2 + term_3 + term_4);
 
+    if (isNaN(delta_e)) {
+        alert("NaN is in delta_e");
+    }
+
     return delta_e;
 }
 
@@ -292,7 +315,7 @@ function findClosestColor(r1, g1, b1) {
 
         const database_XYZ_values = RGBtoXYZ(r2, g2, b2);
         const database_CIE_values = XYZtoCIELAB(database_XYZ_values);
-        const distance = deltaE_CIE(database_CIE_values, image_CIE_values);
+        const distance = deltaE_2000(database_CIE_values, image_CIE_values);
         
         
         if (distance < closest_distance) {
