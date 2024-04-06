@@ -4,7 +4,7 @@
  */
 
 /*
-Copyright (C) 2024  Omar Eid
+Copyright (C) 2024 Omar Eid 
 
 This file is part of Color Descriptor Application.
 Color Descriptor Application is free software: you can redistribute it and/or modify
@@ -106,9 +106,9 @@ function RGBtoXYZ(red, green, blue) {
     new_blue = new_blue * 100;
     new_green = new_green * 100;
 
-    var X = (new_red * 0.4124) + (new_green * 0.3576) + (new_blue * 0.1805);
-    var Y = (new_red * 0.2126) + (new_green * 0.7152) + (new_blue * 0.0722);
-    var Z = (new_red * 0.0193) + (new_green * 0.1192) + (new_blue * 0.9505);
+    var X = (new_red * 0.4124564) + (new_green * 0.3575761) + (new_blue * 0.1804375);
+    var Y = (new_red * 0.2126729) + (new_green * 0.7151522) + (new_blue * 0.0721750);
+    var Z = (new_red * 0.0193339) + (new_green * 0.1191920) + (new_blue * 0.9503041);
 
     const XYZ_values = {"X": X, "Y": Y, "Z": Z};
     console.log(XYZ_values);
@@ -117,11 +117,14 @@ function RGBtoXYZ(red, green, blue) {
 
 
 
+const x_illum = 94.811;
+const y_illum = 100.000;
+const z_illum = 107.304;
 // convert XYZ to CIELab using a D65/2° illuminaugt observer
 function XYZtoCIELAB(imageValues) {
-    var new_x = imageValues["X"] / 95.047;
-    var new_y = imageValues["Y"] / 100.000;
-    var new_z = imageValues["Z"] / 108.883;
+    var new_x = imageValues["X"] / x_illum;
+    var new_y = imageValues["Y"] / y_illum;
+    var new_z = imageValues["Z"] / z_illum;
 
     if (new_x > 0.008856) {
         new_x = new_x ** (1/3);
