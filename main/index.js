@@ -73,6 +73,7 @@ function displayColor(event) {
 // use  Delta E* 2000 for finding the smallest distance between colors 
 // https://sensing.konicaminolta.us/us/blog/understanding-standard-observers-in-color-measurement/
 
+//TODO check the math and color spacing on conversion functions.
 
 function RGBtoXYZ(red, green, blue) {
     var new_red = red / 255;
